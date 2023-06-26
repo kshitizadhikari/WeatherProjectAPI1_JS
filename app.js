@@ -1,11 +1,28 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const https = require("https");
+const { dirname } = require("path");
 
 const app = express();
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static("public"));
 
 app.get("/", function (req, res) {
+  res.sendFile(__dirname + "/index.html");
+});
+
+app.post("/", function (req, res) {
+  const query = req.body.cityName;
+  const units = "metric";
+  const appid = "436fecc4a8aee0790c13604163a6d541";
   const url =
-    "https://api.openweathermap.org/data/2.5/weather?q=Kathmandu&units=metric&appid=436fecc4a8aee0790c13604163a6d541";
+    "https://api.openweathermap.org/data/2.5/weather?q=" +
+    query +
+    "&units=" +
+    units +
+    "&appid=" +
+    appid +
+    "";
 
   https.get(url, function (api_response) {
     console.log(api_response.statusCode);
@@ -21,7 +38,6 @@ app.get("/", function (req, res) {
       res.write("<h1>Weather in " + location + "</h1>");
       res.write("<p>Temperature: " + temp + "°C</p>");
       res.write("<p>Description: " + description + "</p>");
-      res.write("<h2>ID: " + icondID + "</h2>");
       res.write('<img src="' + imageURL + '" alt="Weather Icon">');
       res.send();
     });
